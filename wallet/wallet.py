@@ -10,9 +10,10 @@ load_dotenv()
 mnemonic=os.getenv("mnemonic")
 
 # Import constants.py and necessary functions from bit and web3
-from constants.py import *
+from constants import *
 from bit import PrivateKeyTestnet
 from bit.network import NetworkAPI
+from pprint import pprint
 #from eth_account import Account
 from web3 import Web3, middleware, Account
 
@@ -20,18 +21,19 @@ w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
 
 # Create a function called `derive_wallets`
 def derive_wallets(coin=BTC, mnemonic=mnemonic, depth=3):
-    command = './derive -g --mnemonic={mnemonic} --coin={coin} --numderive={depth} --format=json'
+    command = f'php ./derive -g --mnemonic={mnemonic} --coin={coin} --numderive={depth} --format=json'
     p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     output, err = p.communicate()
+    #print(output)
     p_status = p.wait()
     return json.loads(output)
 
 # # Create a dictionary object called coins to store the output from `derive_wallets`.
 def coins():
     coin_dict = {
-        'btc' : derive_wallets(mnemonic, BTC, 3),
-        'eth' : derive_wallets(mnemonic, ETH, 3)
-        'btc-test' : derive_wallets(mnemonic, BTCTEST, 3),
+        'btc' : derive_wallets(BTC, mnemonic, 3),
+        'eth' : derive_wallets(ETH, mnemonic, 3),
+        'btc-test' : derive_wallets(BTCTEST, mnemonic, 3),
     }
     return coin_dict
 
@@ -74,4 +76,11 @@ def send_tx(coin, account, recipient, amount):
 # btc_acc = priv_key_account(BTCTEST, priv_key='cPATqqavHDLmsLX2Ej7SR5gvF3u9QJHLAC7taSQEcSuYucC6NGnG')
 # create_tx(BTCTEST,btc_acc,"mmPmSpyY8JFvr6JPF1xv4Xae5k7GwXvouS", 0.000001)
 # send_tx(BTCTEST, btc_acc, 'mfkGhz6m2tMwETDU6sgEHY2gp2qcuHaioH', 0.000001)
+
+#Call to Derive Wallets
+coins = {
+    ETH: derive_wallets(coin=ETH),
+    BTC: derive_wallets(coin=BTC),
+}
+pprint(coins())
 
