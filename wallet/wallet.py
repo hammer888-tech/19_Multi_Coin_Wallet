@@ -14,14 +14,20 @@ from constants import *
 from bit import PrivateKeyTestnet
 from bit.network import NetworkAPI
 from pprint import pprint
+
 #from eth_account import Account
 from web3 import Web3, middleware, Account
+from web3.middleware import geth_poa_middleware
+from web3.gas_strategies.time_based import medium_gas_price_strategy
 
 w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
+w3.eth.setGasPriceStrategy(medium_gas_price_strategy)
+w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 
 # Create a function called `derive_wallets`
 def derive_wallets(coin=BTC, mnemonic=mnemonic, depth=3):
-    command = f'php ./derive -g --mnemonic={mnemonic} --coin={coin} --numderive={depth} --format=json'
+    command = f'php ./derive -g --mnemonic="{mnemonic}" --coin={coin} --numderive={depth} --format=json --cols=all'
+    #print(command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     output, err = p.communicate()
     #print(output)
@@ -73,14 +79,26 @@ def send_tx(coin, account, recipient, amount):
         return NetworkAPI.broadcast_tx_testnet(signed_tx)
 
 # BTCTEST Transaction
-# btc_acc = priv_key_account(BTCTEST, priv_key='cPATqqavHDLmsLX2Ej7SR5gvF3u9QJHLAC7taSQEcSuYucC6NGnG')
-# create_tx(BTCTEST,btc_acc,"mmPmSpyY8JFvr6JPF1xv4Xae5k7GwXvouS", 0.000001)
-# send_tx(BTCTEST, btc_acc, 'mfkGhz6m2tMwETDU6sgEHY2gp2qcuHaioH', 0.000001)
+coins_value = coins()
+#print (coins_value [BTCTEST][0]['privkey'])
+#account = priv_key_to_account(BTCTEST, coins[BTCTEST][0]['privkey'])
+btc_acc = priv_key_account(BTCTEST, coins_value[BTCTEST][0]['privkey'])
+#create_tx(BTCTEST,btc_acc, coins[BTCTEST][1]['address']), 0.000001)
+send_tx(BTCTEST, btc_acc, coins_value[BTCTEST][1]['address'], 0.000001)
+
+# ethTEST Transaction
+coins_value = coins()
+#print (coins_value [BTCTEST][0]['privkey'])
+#account = priv_key_to_account(BTCTEST, coins[BTCTEST][0]['privkey'])
+eth_acc = priv_key_account(ETH, coins_value[ETH][0]['privkey'])
+#create_tx(BTCTEST,btc_acc, coins[BTCTEST][1]['address']), 0.000001)
+send_tx(ETH, eth_acc, coins_value[ETH][1]['address'], 0.000001)
+
 
 #Call to Derive Wallets
-coins = {
+coins_1 = {
     ETH: derive_wallets(coin=ETH),
     BTC: derive_wallets(coin=BTC),
 }
-pprint(coins())
+#pprint(coins())
 
