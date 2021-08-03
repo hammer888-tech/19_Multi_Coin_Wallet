@@ -27,7 +27,7 @@ w3.middleware_onion.inject(geth_poa_middleware, layer=0)
 # Create a function called `derive_wallets`
 def derive_wallets(coin=BTC, mnemonic=mnemonic, depth=3):
     command = f'php ./derive -g --mnemonic="{mnemonic}" --coin={coin} --numderive={depth} --format=json --cols=all'
-    #print(command)
+    print(command)
     p = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True)
     output, err = p.communicate()
     #print(output)
@@ -81,18 +81,13 @@ def send_tx(coin, account, recipient, amount):
 # BTCTEST Transaction
 coins_value = coins()
 #print (coins_value [BTCTEST][0]['privkey'])
-#account = priv_key_to_account(BTCTEST, coins[BTCTEST][0]['privkey'])
 btc_acc = priv_key_account(BTCTEST, coins_value[BTCTEST][0]['privkey'])
-#create_tx(BTCTEST,btc_acc, coins[BTCTEST][1]['address']), 0.000001)
 send_tx(BTCTEST, btc_acc, coins_value[BTCTEST][1]['address'], 0.000001)
 
-# ethTEST Transaction
-coins_value = coins()
-#print (coins_value [BTCTEST][0]['privkey'])
-#account = priv_key_to_account(BTCTEST, coins[BTCTEST][0]['privkey'])
-eth_acc = priv_key_account(ETH, coins_value[ETH][0]['privkey'])
-#create_tx(BTCTEST,btc_acc, coins[BTCTEST][1]['address']), 0.000001)
-send_tx(ETH, eth_acc, coins_value[ETH][1]['address'], 0.000001)
+# # ethTEST Transaction
+# coins_value = coins()
+# eth_acc = priv_key_account(ETH, coins_value[ETH][0]['privkey'])
+# send_tx(ETH, eth_acc, coins_value[ETH][1]['address'], 0.000001)
 
 
 #Call to Derive Wallets
